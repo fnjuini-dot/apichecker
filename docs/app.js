@@ -1,14 +1,18 @@
-function sslClass(daysLeft) {
-  if (daysLeft === null) return "red";
-  if (daysLeft <= 30) return "red";
-  if (daysLeft <= 90) return "yellow";
+function sslClass(state) {
+  if (state === "action") return "red";
+  if (state === "renewal") return "yellow";
   return "green";
 }
 
-function barWidth(daysLeft) {
-  if (daysLeft === null) return 100;
-  const pct = Math.min((daysLeft / 365) * 100, 100);
-  return Math.max(pct, 2);
+function sslLabel(site) {
+  if (site.sslState === "renewal") return "Renewal in progress";
+  if (site.sslState === "action") return "Action required";
+  return "OK";
+}
+
+function barWidth(days) {
+  if (!days) return 100;
+  return Math.min((days / 365) * 100, 100);
 }
 
 async function load() {
@@ -21,38 +25,35 @@ async function load() {
   meta.textContent = `Last updated: ${data.generatedAt}`;
   list.innerHTML = "";
 
-  for (const s of data.sites) {
-    const overallOk = s.dnsOk && s.tlsOk && s.httpOk && s.pageOk;
-    const badgeClass = overallOk ? "ok" : "bad";
-    const badgeText = overallOk ? "OK" : "ISSUE";
-
-    const sslDays = s.sslDaysLeft;
-
+  data.sites.forEach(s => {
     const card = document.createElement("div");
     card.className = "card";
+
     card.innerHTML = `
       <div class="row">
         <div class="url">${s.url}</div>
-        <div class="badge ${badgeClass}">${badgeText}</div>
+        <div class="badge ${sslClass(s.sslState)}">${sslLabel(s)}</div>
       </div>
 
       <div class="grid">
-        <div class="kv">DNS: <span class="${s.dnsOk ? "ok" : "bad"}">${s.dnsOk ? "OK" : "FAIL"}</span></div>
-        <div class="kv">TLS: <span class="${s.tlsOk ? "ok" : "bad"}">${s.tlsOk ? "OK" : "FAIL"}</span></div>
-        <div class="kv">HTTP: <span class="${s.httpOk ? "ok" : "bad"}">${s.httpStatus}</span></div>
+        <div>DNS: <span class="${s.dnsOk ? "ok" : "bad"}">${s.dnsOk ? "OK" : "FAIL"}</span></div>
+        <div>HTTP: <span class="${s.httpOk ? "ok" : "bad"}">${s.httpStatus ?? "—"}</span></div>
+        <div>Page: <span class="${s.pageOk ? "ok" : "bad"}">${s.pageOk ? "OK" : "ERR"}</span></div>
       </div>
 
       <div class="barwrap">
         <div class="barbg">
-          <div class="bar ${sslClass(sslDays)}" style="width:${barWidth(sslDays)}%"></div>
+          <div class="bar ${sslClass(s.sslState)}" style="width:${barWidth(s.sslDaysLeft)}%"></div>
         </div>
         <div class="small">
-          SSL days left: <strong>${sslDays}</strong>
+          SSL days left: <strong>${s.sslDaysLeft ?? "—"}</strong>
+          &nbsp;|&nbsp; Issuer: ${s.sslIssuer ?? "—"}
         </div>
       </div>
     `;
+
     list.appendChild(card);
-  }
+  });
 }
 
 load();
