@@ -20,6 +20,9 @@ const SITES = [
 const OUT_FILE = "docs/status.json";
 const TIMEOUT_MS = 12000;
 
+/* Known Let's Encrypt intermediates */
+const LE_INTERMEDIATES = ["E7", "R3", "R10", "R11"];
+
 function nowIso() {
   return new Date().toISOString();
 }
@@ -33,13 +36,21 @@ function fetchPage(urlStr) {
   return new Promise((resolve) => {
     const req = https.request(
       urlStr,
-      { timeout: TIMEOUT_MS, headers: { "User-Agent": "site-status-bot/1.0" } },
+      {
+        timeout: TIMEOUT_MS,
+        headers: { "User-Agent": "site-status-bot/1.0" }
+      },
       (res) => {
         let body = "";
-        res.on("data", c => { if (body.length < 200000) body += c; });
-        res.on("end", () => resolve({ ok: true, status: res.statusCode, body }));
+        res.on("data", c => {
+          if (body.length < 200000) body += c;
+        });
+        res.on("end", () =>
+          resolve({ ok: true, status: res.statusCode, body })
+        );
       }
     );
+
     req.on("timeout", () => resolve({ ok: false }));
     req.on("error", () => resolve({ ok: false }));
     req.end();
@@ -49,7 +60,12 @@ function fetchPage(urlStr) {
 function getTlsCert(hostname) {
   return new Promise((resolve) => {
     const socket = tls.connect(
-      { host: hostname, port: 443, servername: hostname, timeout: TIMEOUT_MS },
+      {
+        host: hostname,
+        port: 443,
+        servername: hostname,
+        timeout: TIMEOUT_MS
+      },
       () => {
         const cert = socket.getPeerCertificate();
         socket.end();
@@ -57,19 +73,29 @@ function getTlsCert(hostname) {
         resolve({
           ok: true,
           expiresAt: cert?.valid_to ? new Date(cert.valid_to) : null,
-          issuer: cert?.issuer?.O || null,
+          issuer: cert?.issuer?.O || cert?.issuer?.CN || null,
           serial: cert?.serialNumber || null
         });
       }
     );
-    socket.on("error", () => resolve({ ok: false }));
-    socket.on("timeout", () => resolve({ ok: false }));
+
+    socket.on("error", () =>
+      resolve({ ok: false, expiresAt: null, issuer: null, serial: null })
+    );
+    socket.on("timeout", () =>
+      resolve({ ok: false, expiresAt: null, issuer: null, serial: null })
+    );
   });
 }
 
 function pageLooksOk(status, body) {
   if (!status || status >= 400) return false;
-  const bad = ["application error", "bad gateway", "service unavailable"];
+  const bad = [
+    "application error",
+    "bad gateway",
+    "service unavailable",
+    "gateway timeout"
+  ];
   return !bad.some(b => body.toLowerCase().includes(b));
 }
 
@@ -78,7 +104,11 @@ async function checkOne(siteUrl) {
   const host = u.hostname;
 
   let dnsOk = true;
-  try { await dns.lookup(host); } catch { dnsOk = false; }
+  try {
+    await dns.lookup(host);
+  } catch {
+    dnsOk = false;
+  }
 
   const tlsRes = await getTlsCert(host);
   const httpRes = await fetchPage(siteUrl);
@@ -91,8 +121,12 @@ async function checkOne(siteUrl) {
     httpOk: httpRes.ok && httpRes.status < 400,
     httpStatus: httpRes.status || null,
     pageOk: pageLooksOk(httpRes.status, httpRes.body || ""),
-    sslExpiresAt: tlsRes.expiresAt ? tlsRes.expiresAt.toISOString() : null,
-    sslDaysLeft: tlsRes.expiresAt ? daysUntil(tlsRes.expiresAt) : null,
+    sslExpiresAt: tlsRes.expiresAt
+      ? tlsRes.expiresAt.toISOString()
+      : null,
+    sslDaysLeft: tlsRes.expiresAt
+      ? daysUntil(tlsRes.expiresAt)
+      : null,
     sslIssuer: tlsRes.issuer,
     sslSerial: tlsRes.serial
   };
@@ -110,10 +144,12 @@ async function main() {
     const r = await checkOne(site);
     const prev = previous?.sites?.find(p => p.url === r.url);
 
+    /* Default state */
     r.sslState = "ok";
 
+    /* Renewal in progress (Let’s Encrypt rotation detected) */
     if (
-      r.sslIssuer === "Let's Encrypt" &&
+      LE_INTERMEDIATES.includes(r.sslIssuer) &&
       r.sslDaysLeft !== null &&
       r.sslDaysLeft > 30 &&
       r.sslDaysLeft <= 45 &&
@@ -125,6 +161,7 @@ async function main() {
       r.sslState = "renewal";
     }
 
+    /* Real action required */
     if (r.sslDaysLeft !== null && r.sslDaysLeft <= 30) {
       r.sslState = "action";
     }
@@ -134,11 +171,18 @@ async function main() {
 
   fs.writeFileSync(
     OUT_FILE,
-    JSON.stringify({ generatedAt: nowIso(), sites: results }, null, 2)
+    JSON.stringify(
+      {
+        generatedAt: nowIso(),
+        sites: results
+      },
+      null,
+      2
+    )
   );
 }
 
-main().catch(e => {
-  console.error(e);
+main().catch(err => {
+  console.error(err);
   process.exit(1);
 });
