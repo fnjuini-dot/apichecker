@@ -67,13 +67,18 @@ function getTlsCert(hostname) {
         timeout: TIMEOUT_MS
       },
       () => {
-        const cert = socket.getPeerCertificate();
+        const cert = socket.getPeerCertificate(true);
         socket.end();
+
+        const issuerCert = cert?.issuerCertificate || null;
 
         resolve({
           ok: true,
           expiresAt: cert?.valid_to ? new Date(cert.valid_to) : null,
-          issuer: cert?.issuer?.O || cert?.issuer?.CN || null,
+          issuer:
+            issuerCert?.subject?.O ||
+            issuerCert?.subject?.CN ||
+            null,
           serial: cert?.serialNumber || null
         });
       }
@@ -87,6 +92,7 @@ function getTlsCert(hostname) {
     );
   });
 }
+
 
 function pageLooksOk(status, body) {
   if (!status || status >= 400) return false;
