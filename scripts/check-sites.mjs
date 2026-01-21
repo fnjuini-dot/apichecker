@@ -70,28 +70,55 @@ function getTlsCert(hostname) {
         const cert = socket.getPeerCertificate(true);
         socket.end();
 
-        const issuerCert = cert?.issuerCertificate || null;
+        console.log("---- TLS DEBUG START ----");
+        console.log("HOST:", hostname);
+        console.log("CERT KEYS:", Object.keys(cert || {}));
+        console.log("CERT SUBJECT:", cert?.subject || null);
+        console.log("CERT ISSUER:", cert?.issuer || null);
+        console.log("CERT SERIAL:", cert?.serialNumber || null);
+        console.log("CERT VALID TO:", cert?.valid_to || null);
+
+        if (cert?.issuerCertificate) {
+          console.log("ISSUER CERT SUBJECT:", cert.issuerCertificate.subject || null);
+          console.log("ISSUER CERT ISSUER:", cert.issuerCertificate.issuer || null);
+          console.log(
+            "ISSUER CERT KEYS:",
+            Object.keys(cert.issuerCertificate || {})
+          );
+        } else {
+          console.log("NO issuerCertificate present");
+        }
+
+        console.log("---- TLS DEBUG END ----");
+
+        const issuer =
+          cert?.issuer?.O ||
+          cert?.issuer?.CN ||
+          cert?.issuerCertificate?.subject?.O ||
+          cert?.issuerCertificate?.subject?.CN ||
+          null;
 
         resolve({
           ok: true,
           expiresAt: cert?.valid_to ? new Date(cert.valid_to) : null,
-          issuer:
-            issuerCert?.subject?.O ||
-            issuerCert?.subject?.CN ||
-            null,
+          issuer,
           serial: cert?.serialNumber || null
         });
       }
     );
 
-    socket.on("error", () =>
-      resolve({ ok: false, expiresAt: null, issuer: null, serial: null })
-    );
-    socket.on("timeout", () =>
-      resolve({ ok: false, expiresAt: null, issuer: null, serial: null })
-    );
+    socket.on("error", (e) => {
+      console.log("TLS ERROR:", hostname, e.message);
+      resolve({ ok: false, expiresAt: null, issuer: null, serial: null });
+    });
+
+    socket.on("timeout", () => {
+      console.log("TLS TIMEOUT:", hostname);
+      resolve({ ok: false, expiresAt: null, issuer: null, serial: null });
+    });
   });
 }
+
 
 
 function pageLooksOk(status, body) {
