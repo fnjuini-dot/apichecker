@@ -1,115 +1,145 @@
 {
-  "generatedAt": "2026-01-21T16:04:09.488Z",
+  "generatedAt": "2026-01-21T18:10:27.400Z",
   "sites": [
     {
       "url": "https://www.kearney.com/",
-      "checkedAt": "2026-01-21T16:04:06.526Z",
+      "checkedAt": "2026-01-21T18:10:21.458Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
       "httpStatus": 200,
       "pageOk": true,
       "sslExpiresAt": "2026-02-27T09:41:21.000Z",
-      "sslDaysLeft": 37
+      "sslDaysLeft": 37,
+      "sslIssuer": "Let's Encrypt",
+      "sslSerial": "051B6E97C04496C3878A2D16F4813397D31C",
+      "sslState": "ok"
     },
     {
       "url": "https://www.de.kearney.com/",
-      "checkedAt": "2026-01-21T16:04:06.729Z",
+      "checkedAt": "2026-01-21T18:10:22.124Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
       "httpStatus": 200,
       "pageOk": true,
       "sslExpiresAt": "2027-01-20T23:59:59.000Z",
-      "sslDaysLeft": 365
+      "sslDaysLeft": 365,
+      "sslIssuer": "DigiCert Inc",
+      "sslSerial": "0DDFCF758F645C22FC7E7AF55ECAA0B1",
+      "sslState": "ok"
     },
     {
       "url": "https://www.es.kearney.com/",
-      "checkedAt": "2026-01-21T16:04:06.923Z",
+      "checkedAt": "2026-01-21T18:10:22.411Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
       "httpStatus": 200,
       "pageOk": true,
       "sslExpiresAt": "2027-01-20T23:59:59.000Z",
-      "sslDaysLeft": 365
+      "sslDaysLeft": 365,
+      "sslIssuer": "DigiCert Inc",
+      "sslSerial": "0DDFCF758F645C22FC7E7AF55ECAA0B1",
+      "sslState": "ok"
     },
     {
       "url": "https://www.jp.kearney.com/",
-      "checkedAt": "2026-01-21T16:04:07.074Z",
+      "checkedAt": "2026-01-21T18:10:22.667Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
       "httpStatus": 200,
       "pageOk": true,
       "sslExpiresAt": "2027-01-20T23:59:59.000Z",
-      "sslDaysLeft": 365
+      "sslDaysLeft": 365,
+      "sslIssuer": "DigiCert Inc",
+      "sslSerial": "0DDFCF758F645C22FC7E7AF55ECAA0B1",
+      "sslState": "ok"
     },
     {
       "url": "https://www.kearney.cn/",
-      "checkedAt": "2026-01-21T16:04:07.381Z",
+      "checkedAt": "2026-01-21T18:10:23.852Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
       "httpStatus": 200,
       "pageOk": true,
       "sslExpiresAt": "2026-03-11T12:06:03.000Z",
-      "sslDaysLeft": 49
+      "sslDaysLeft": 49,
+      "sslIssuer": "Google Trust Services",
+      "sslSerial": "DE686C9EB2F928470E50C305048879D4",
+      "sslState": "ok"
     },
     {
       "url": "https://www.kearney.co.kr/",
-      "checkedAt": "2026-01-21T16:04:07.630Z",
+      "checkedAt": "2026-01-21T18:10:25.279Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
       "httpStatus": 200,
       "pageOk": true,
       "sslExpiresAt": "2026-04-11T02:47:02.000Z",
-      "sslDaysLeft": 80
+      "sslDaysLeft": 80,
+      "sslIssuer": "Google Trust Services",
+      "sslSerial": "28989FC20D5CC7C90EB2D3860D416679",
+      "sslState": "ok"
     },
     {
       "url": "https://www.middle-east.kearney.com/",
-      "checkedAt": "2026-01-21T16:04:07.768Z",
+      "checkedAt": "2026-01-21T18:10:25.496Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
       "httpStatus": 200,
       "pageOk": true,
       "sslExpiresAt": "2027-01-20T23:59:59.000Z",
-      "sslDaysLeft": 365
+      "sslDaysLeft": 365,
+      "sslIssuer": "DigiCert Inc",
+      "sslSerial": "0DDFCF758F645C22FC7E7AF55ECAA0B1",
+      "sslState": "ok"
     },
     {
       "url": "https://www.prokura.com/",
-      "checkedAt": "2026-01-21T16:04:08.172Z",
+      "checkedAt": "2026-01-21T18:10:25.880Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
       "httpStatus": 200,
       "pageOk": true,
       "sslExpiresAt": "2026-04-17T21:55:39.000Z",
-      "sslDaysLeft": 87
+      "sslDaysLeft": 87,
+      "sslIssuer": "Let's Encrypt",
+      "sslSerial": "05BC034423A1024063E5B8E9B26773D01BBC",
+      "sslState": "ok"
     },
     {
       "url": "https://www.jp.prokura.com/",
-      "checkedAt": "2026-01-21T16:04:08.877Z",
+      "checkedAt": "2026-01-21T18:10:26.736Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
       "httpStatus": 200,
       "pageOk": true,
       "sslExpiresAt": "2026-04-18T08:32:22.000Z",
-      "sslDaysLeft": 87
+      "sslDaysLeft": 87,
+      "sslIssuer": "Let's Encrypt",
+      "sslSerial": "061CF4603D17A28B836E0CDE3F4DEE6C5846",
+      "sslState": "ok"
     },
     {
       "url": "https://www.de.prokura.com/",
-      "checkedAt": "2026-01-21T16:04:09.488Z",
+      "checkedAt": "2026-01-21T18:10:27.398Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
       "httpStatus": 200,
       "pageOk": true,
       "sslExpiresAt": "2026-04-27T23:59:59.000Z",
-      "sslDaysLeft": 97
+      "sslDaysLeft": 97,
+      "sslIssuer": "DigiCert Inc",
+      "sslSerial": "06D95932AADFE166D8FC0003D1242367",
+      "sslState": "ok"
     }
   ]
 }
