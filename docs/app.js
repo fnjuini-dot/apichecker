@@ -1,3 +1,8 @@
+function prettyIssuer(i) {
+  if (!i) return "—";
+  if (i === "E7" || i.startsWith("R")) return "Let's Encrypt";
+  return i;
+}
 function sslClass(state) {
   if (state === "action") return "red";
   if (state === "renewal") return "yellow";
@@ -47,7 +52,7 @@ async function load() {
         </div>
         <div class="small">
           SSL days left: <strong>${s.sslDaysLeft ?? "—"}</strong>
-          &nbsp;|&nbsp; Issuer: ${s.sslIssuer ?? "—"}
+          &nbsp;|&nbsp; Issuer: ${prettyIssuer(s.sslIssuer)}
         </div>
       </div>
     `;
