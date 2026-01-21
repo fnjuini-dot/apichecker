@@ -33,29 +33,15 @@ function fetchPage(urlStr) {
   return new Promise((resolve) => {
     const req = https.request(
       urlStr,
-      {
-        method: "GET",
-        timeout: TIMEOUT_MS,
-        headers: { "User-Agent": "site-status-bot/1.0" }
-      },
+      { timeout: TIMEOUT_MS, headers: { "User-Agent": "site-status-bot/1.0" } },
       (res) => {
         let body = "";
-        res.setEncoding("utf8");
-        res.on("data", (c) => {
-          if (body.length < 200000) body += c;
-        });
-        res.on("end", () => {
-          resolve({ ok: true, status: res.statusCode, body });
-        });
+        res.on("data", c => { if (body.length < 200000) body += c; });
+        res.on("end", () => resolve({ ok: true, status: res.statusCode, body }));
       }
     );
-
-    req.on("timeout", () => {
-      req.destroy();
-      resolve({ ok: false, status: null, body: "" });
-    });
-
-    req.on("error", () => resolve({ ok: false, status: null, body: "" }));
+    req.on("timeout", () => resolve({ ok: false }));
+    req.on("error", () => resolve({ ok: false }));
     req.end();
   });
 }
@@ -63,51 +49,28 @@ function fetchPage(urlStr) {
 function getTlsCert(hostname) {
   return new Promise((resolve) => {
     const socket = tls.connect(
-      {
-        host: hostname,
-        port: 443,
-        servername: hostname,
-        timeout: TIMEOUT_MS
-      },
+      { host: hostname, port: 443, servername: hostname, timeout: TIMEOUT_MS },
       () => {
         const cert = socket.getPeerCertificate();
         socket.end();
 
-        if (!cert || !cert.valid_to) {
-          resolve({ ok: true, expiresAt: null });
-          return;
-        }
-
         resolve({
           ok: true,
-          expiresAt: new Date(cert.valid_to)
+          expiresAt: cert?.valid_to ? new Date(cert.valid_to) : null,
+          issuer: cert?.issuer?.O || null,
+          serial: cert?.serialNumber || null
         });
       }
     );
-
-    socket.on("timeout", () => {
-      socket.destroy();
-      resolve({ ok: false, expiresAt: null });
-    });
-
-    socket.on("error", () => resolve({ ok: false, expiresAt: null }));
+    socket.on("error", () => resolve({ ok: false }));
+    socket.on("timeout", () => resolve({ ok: false }));
   });
 }
 
 function pageLooksOk(status, body) {
   if (!status || status >= 400) return false;
-  const text = body.toLowerCase();
-  const bad = [
-    "application error",
-    "bad gateway",
-    "service unavailable",
-    "gateway timeout",
-    "error 500",
-    "error 502",
-    "error 503",
-    "error 504"
-  ];
-  return !bad.some((s) => text.includes(s));
+  const bad = ["application error", "bad gateway", "service unavailable"];
+  return !bad.some(b => body.toLowerCase().includes(b));
 }
 
 async function checkOne(siteUrl) {
@@ -115,17 +78,10 @@ async function checkOne(siteUrl) {
   const host = u.hostname;
 
   let dnsOk = true;
-  try {
-    await dns.lookup(host);
-  } catch {
-    dnsOk = false;
-  }
+  try { await dns.lookup(host); } catch { dnsOk = false; }
 
   const tlsRes = await getTlsCert(host);
-  const sslExpiresAt = tlsRes.expiresAt;
-
   const httpRes = await fetchPage(siteUrl);
-  const pageOk = pageLooksOk(httpRes.status, httpRes.body);
 
   return {
     url: siteUrl,
@@ -133,29 +89,56 @@ async function checkOne(siteUrl) {
     dnsOk,
     tlsOk: tlsRes.ok,
     httpOk: httpRes.ok && httpRes.status < 400,
-    httpStatus: httpRes.status,
-    pageOk,
-    sslExpiresAt: sslExpiresAt ? sslExpiresAt.toISOString() : null,
-    sslDaysLeft: sslExpiresAt ? daysUntil(sslExpiresAt) : null
+    httpStatus: httpRes.status || null,
+    pageOk: pageLooksOk(httpRes.status, httpRes.body || ""),
+    sslExpiresAt: tlsRes.expiresAt ? tlsRes.expiresAt.toISOString() : null,
+    sslDaysLeft: tlsRes.expiresAt ? daysUntil(tlsRes.expiresAt) : null,
+    sslIssuer: tlsRes.issuer,
+    sslSerial: tlsRes.serial
   };
 }
 
 async function main() {
+  let previous = null;
+  try {
+    previous = JSON.parse(fs.readFileSync(OUT_FILE, "utf8"));
+  } catch {}
+
   const results = [];
+
   for (const site of SITES) {
-    results.push(await checkOne(site));
+    const r = await checkOne(site);
+    const prev = previous?.sites?.find(p => p.url === r.url);
+
+    r.sslState = "ok";
+
+    if (
+      r.sslIssuer === "Let's Encrypt" &&
+      r.sslDaysLeft !== null &&
+      r.sslDaysLeft > 30 &&
+      r.sslDaysLeft <= 45 &&
+      prev &&
+      prev.sslSerial &&
+      r.sslSerial &&
+      prev.sslSerial !== r.sslSerial
+    ) {
+      r.sslState = "renewal";
+    }
+
+    if (r.sslDaysLeft !== null && r.sslDaysLeft <= 30) {
+      r.sslState = "action";
+    }
+
+    results.push(r);
   }
 
-  const payload = {
-    generatedAt: nowIso(),
-    sites: results
-  };
-
-  fs.mkdirSync("docs", { recursive: true });
-  fs.writeFileSync(OUT_FILE, JSON.stringify(payload, null, 2));
+  fs.writeFileSync(
+    OUT_FILE,
+    JSON.stringify({ generatedAt: nowIso(), sites: results }, null, 2)
+  );
 }
 
-main().catch((e) => {
+main().catch(e => {
   console.error(e);
   process.exit(1);
 });
