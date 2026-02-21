@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-02-21T20:48:47.468Z",
+  "generatedAt": "2026-02-21T21:23:12.573Z",
   "sites": [
     {
       "url": "https://www.kearney.com/",
-      "checkedAt": "2026-02-21T20:48:45.366Z",
+      "checkedAt": "2026-02-21T21:23:09.936Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
@@ -17,7 +17,7 @@
     },
     {
       "url": "https://www.de.kearney.com/",
-      "checkedAt": "2026-02-21T20:48:45.441Z",
+      "checkedAt": "2026-02-21T21:23:10.486Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
@@ -31,7 +31,7 @@
     },
     {
       "url": "https://www.es.kearney.com/",
-      "checkedAt": "2026-02-21T20:48:45.512Z",
+      "checkedAt": "2026-02-21T21:23:10.722Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
@@ -45,7 +45,7 @@
     },
     {
       "url": "https://www.jp.kearney.com/",
-      "checkedAt": "2026-02-21T20:48:45.570Z",
+      "checkedAt": "2026-02-21T21:23:10.798Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
@@ -59,7 +59,7 @@
     },
     {
       "url": "https://www.kearney.cn/",
-      "checkedAt": "2026-02-21T20:48:45.841Z",
+      "checkedAt": "2026-02-21T21:23:11.088Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
@@ -73,7 +73,7 @@
     },
     {
       "url": "https://www.kearney.co.kr/",
-      "checkedAt": "2026-02-21T20:48:46.024Z",
+      "checkedAt": "2026-02-21T21:23:11.274Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
@@ -87,7 +87,7 @@
     },
     {
       "url": "https://www.middle-east.kearney.com/",
-      "checkedAt": "2026-02-21T20:48:46.093Z",
+      "checkedAt": "2026-02-21T21:23:11.333Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
@@ -101,7 +101,7 @@
     },
     {
       "url": "https://www.prokura.com/",
-      "checkedAt": "2026-02-21T20:48:46.368Z",
+      "checkedAt": "2026-02-21T21:23:11.764Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
@@ -115,7 +115,7 @@
     },
     {
       "url": "https://www.jp.prokura.com/",
-      "checkedAt": "2026-02-21T20:48:47.051Z",
+      "checkedAt": "2026-02-21T21:23:12.509Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
@@ -129,7 +129,7 @@
     },
     {
       "url": "https://www.de.prokura.com/",
-      "checkedAt": "2026-02-21T20:48:47.465Z",
+      "checkedAt": "2026-02-21T21:23:12.571Z",
       "dnsOk": true,
       "tlsOk": true,
       "httpOk": true,
